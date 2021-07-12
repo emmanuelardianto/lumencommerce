@@ -20,6 +20,11 @@ class ProductController extends Controller
 
     }
 
+    public function getById($id) {
+        $product = Product::where('id', $id)->first();
+        return response()->json($product);
+    }
+
     /**
      * Show the form for creating a new resource.
      *

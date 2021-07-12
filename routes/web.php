@@ -19,4 +19,5 @@ $router->get('/', function () use ($router) {
 
 $router->group([ 'prefix' => 'product'], function () use($router) {
     $router->get('/', 'ProductController@index');
+    $router->get('/{id}', 'ProductController@getById');
 });
