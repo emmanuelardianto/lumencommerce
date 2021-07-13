@@ -5,18 +5,33 @@ namespace App\Http\Controllers;
 use App\Models\Product;
 use App\Models\Category;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
+use Validator;
 
 class ProductController extends Controller
 {
-    public function index(Request $request)
+    public function list(Request $request)
     {
-        $search = $request->get('search');
-        $products = Product::orderBy('name');
-        if(!is_null($search)) {
-            $products = $products->where('name', 'like', '%'.$search.'%');
+        try {
+            $search = $request->get('search');
+            $products = Product::orderBy('name');
+            if(!is_null($search)) {
+                $products = $products->where('name', 'like', '%'.$search.'%');
+            }
+            $products = $product->paginate(20);
+            return response()->json([
+                "data" => $products,
+                "status" => 200,
+                "success" => true
+            ]);
+        } catch (\Throwable $th) {
+            return response()->json([
+                "status" => 200,
+                "success" => false,
+                "message" => $th->getMessage()
+            ]);
         }
-        $products = $products->paginate(20);
-        return response()->json($products);
+        
 
     }
 
@@ -25,58 +40,49 @@ class ProductController extends Controller
         return response()->json($product);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
+    public function create(Request $request)
     {
-        $categories = Category::orderBy('name')->get();
-        return view('admin.product.update', compact('categories'));
-    }
+        try {
+            $validator = Validator::make($request->all(), [
+                'category_id' => 'exists:categories,id',
+                'name' => 'required|max:250',
+                'price' => 'required|numeric',
+                'status' => 'boolean',
+                'description' => 'max:1000'
+            ]);
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request, Product $product)
-    {
-        $request->validate([
-            'name' => 'required',
-            'price' => 'required|numeric',
-            'image' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-        ]);
-
-        $image_url = '';
-        if(is_null($product)) {
+            if ($validator->fails()) {
+                return response()->json([
+                    "status" => 401,
+                    "success" => false,
+                    "message" => $validator->errors()->all()
+                ]);
+            }
+            
             $product = new Product();
-        } else {
-            $image_url = $product->getRawOriginal('image_url');
-        }
-        
-        if ($request->hasFile('image')) {
-            $image = $request->file('image');
-            $image_url = \Str::slug($request->get('name')).time().'.'.$image->getClientOriginalExtension();
-            $destinationPath = public_path('/images');
-            $image->move($destinationPath, $image_url);
-        }
-
-        $product = $product->fill([
-            'category_id' => $request->get('category_id'),
-            'name' => $request->get('name'),
-            'slug' => \Str::slug($request->get('name')),
-            'description' => $request->get('description'),
-            'status' => $request->get('status'),
-            'price' => $request->get('price'),
-            'image_url' => $image_url
-        ]);
     
-
-        $product->save();
-        return redirect()->route('admin.product.edit', compact('product'))->with('success', 'Data saved.');
+            $product = $product->fill([
+                'category_id' => $request->get('category_id'),
+                'name' => $request->get('name'),
+                'slug' => Str::slug($request->get('name')),
+                'description' => $request->get('description'),
+                'status' => $request->get('status'),
+                'price' => $request->get('price'),
+            ]);
+        
+            $product->save();
+            return response()->json([
+                "data" => $product,
+                "status" => 200,
+                "success" => true
+            ]);
+        } catch (\Throwable $th) {
+            return response()->json([
+                "status" => 200,
+                "success" => false,
+                "message" => $th->getMessage()
+            ]);
+        }
     }
 
     /**
