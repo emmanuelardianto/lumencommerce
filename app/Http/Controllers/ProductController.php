@@ -85,40 +85,52 @@ class ProductController extends Controller
         }
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Models\Product  $product
-     * @return \Illuminate\Http\Response
-     */
-    public function show(Product $product)
+    public function update(Request $request)
     {
-        //
+        try {
+            $validator = Validator::make($request->all(), [
+                'id' => 'required|exists:products,id',
+                'category_id' => 'exists:categories,id',
+                'name' => 'required|max:250',
+                'price' => 'required|numeric',
+                'status' => 'boolean',
+                'description' => 'max:1000'
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    "status" => 401,
+                    "success" => false,
+                    "message" => $validator->errors()->all()
+                ]);
+            }
+            
+            $product = Product::where('id', $request->get('id'))->first();
+    
+            $product = $product->fill([
+                'category_id' => $request->get('category_id'),
+                'name' => $request->get('name'),
+                'slug' => Str::slug($request->get('name')),
+                'description' => $request->get('description'),
+                'status' => $request->get('status'),
+                'price' => $request->get('price'),
+            ]);
+        
+            $product->save();
+            return response()->json([
+                "data" => $product,
+                "status" => 200,
+                "success" => true
+            ]);
+        } catch (\Throwable $th) {
+            return response()->json([
+                "status" => 200,
+                "success" => false,
+                "message" => $th->getMessage()
+            ]);
+        }
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\Product  $product
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Product $product)
-    {
-        $categories = Category::orderBy('name')->get();
-        return view('admin.product.update', compact('product', 'categories'));
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Product  $product
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, Product $product)
-    {
-        //
-    }
     public function delete(Request $request)
     {
         try {

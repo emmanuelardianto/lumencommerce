@@ -22,4 +22,5 @@ $router->group([ 'prefix' => 'product'], function () use($router) {
     $router->get('/{id}', 'ProductController@getById');
     $router->post('/create', 'ProductController@create');
     $router->post('/delete', 'ProductController@delete');
+    $router->post('/update', 'ProductController@update');
 });
