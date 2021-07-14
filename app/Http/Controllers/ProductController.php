@@ -119,16 +119,44 @@ class ProductController extends Controller
     {
         //
     }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\Product  $product
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(Product $product)
+    public function delete(Request $request)
     {
-        $product->delete();
-        return redirect()->route('admin.product')->with('success', 'Data deleted.');
+        try {
+            $validator = Validator::make($request->all(), [
+                'id' => 'required'
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    "status" => 401,
+                    "success" => false,
+                    "message" => $validator->errors()->all()
+                ]);
+            }
+            
+            $product = Product::where('id', $request->get('id'))->first();
+            if (is_null($product)) {
+                return response()->json([
+                    "status" => 401,
+                    "success" => false,
+                    "message" => "Data not found."
+                ]);
+            }
+
+        
+            $product->delete();
+            return response()->json([
+                "data" => $product,
+                "status" => 200,
+                "success" => true,
+                "message" => "Successfully deleted product."
+            ]);
+        } catch (\Throwable $th) {
+            return response()->json([
+                "status" => 200,
+                "success" => false,
+                "message" => $th->getMessage()
+            ]);
+        }
     }
 }
