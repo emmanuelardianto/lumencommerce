@@ -32,3 +32,11 @@ $router->group([ 'prefix' => 'category'], function () use($router) {
     $router->post('/delete', 'CategoryController@delete');
     $router->post('/update', 'CategoryController@update');
 });
+
+$router->group([ 'prefix' => 'user'], function () use($router) {
+    $router->get('/', 'UserController@list');
+    $router->get('/{id}', 'UserController@getById');
+    $router->post('/create', 'UserController@create');
+    $router->post('/delete', 'UserController@delete');
+    $router->post('/update', 'UserController@update');
+});

@@ -2,24 +2,24 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Category;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Validator;
 
-class CategoryController extends Controller
+class UserController extends Controller
 {
     public function list(Request $request)
     {
         try {
             $search = $request->get('search');
-            $categories = Category::orderBy('name');
+            $users = User::orderBy('name');
             if(!is_null($search)) {
-                $categories = $categories->where('name', 'like', '%'.$search.'%');
+                $users = $users->where('name', 'like', '%'.$search.'%');
             }
-            $categories = $categories->paginate(20);
+            $users = $users->paginate(20);
             return response()->json([
-                "data" => $categories,
+                "data" => $users,
                 "status" => 200,
                 "success" => true
             ]);
@@ -34,9 +34,9 @@ class CategoryController extends Controller
 
     public function getById($id) {
         try {
-            $category = Category::where('id', $id)->first();
+            $user = User::where('id', $id)->first();
             return response()->json([
-                "data" => $category,
+                "data" => $user,
                 "status" => 200,
                 "success" => true
             ]);
@@ -53,7 +53,9 @@ class CategoryController extends Controller
     {
         try {
             $validator = Validator::make($request->all(), [
-                'name' => 'required|max:250',
+                'email' => 'required|email',
+                'name' => 'required',
+                'password' => 'required'
             ]);
 
             if ($validator->fails()) {
@@ -64,15 +66,19 @@ class CategoryController extends Controller
                 ]);
             }
             
-            $category = new Category();
+            $user = new User();
     
-            $category = $category->fill([
+            $user = $user->fill([
+                'email' => $request->get('email'),
                 'name' => $request->get('name'),
+                'is_admin' => $request->has('is_admin'),
+                'status' => $request->has('status'),
+                'password' => $request->has('password')
             ]);
         
-            $category->save();
+            $user->save();
             return response()->json([
-                "data" => $category,
+                "data" => $user,
                 "status" => 200,
                 "success" => true
             ]);
@@ -89,8 +95,8 @@ class CategoryController extends Controller
     {
         try {
             $validator = Validator::make($request->all(), [
-                'id' => 'required',
-                'name' => 'required|max:250',
+                'email' => 'required|email|unique:users,email,'.$request->get('id'),
+                'name' => 'required',
             ]);
 
             if ($validator->fails()) {
@@ -101,15 +107,18 @@ class CategoryController extends Controller
                 ]);
             }
             
-            $category = Category::where('id', $request->get('id'))->first();
+            $user = User::where('id', $request->get('id'))->first();
     
-            $category = $category->fill([
+            $user = $user->fill([
+                'email' => $request->get('email'),
                 'name' => $request->get('name'),
+                'is_admin' => $request->has('is_admin'),
+                'status' => $request->has('status'),
             ]);
         
-            $category->save();
+            $user->save();
             return response()->json([
-                "data" => $category,
+                "data" => $user,
                 "status" => 200,
                 "success" => true
             ]);
@@ -137,8 +146,8 @@ class CategoryController extends Controller
                 ]);
             }
             
-            $category = Category::where('id', $request->get('id'))->first();
-            if (is_null($category)) {
+            $user = User::where('id', $request->get('id'))->first();
+            if (is_null($user)) {
                 return response()->json([
                     "status" => 401,
                     "success" => false,
@@ -147,12 +156,12 @@ class CategoryController extends Controller
             }
 
         
-            $category->delete();
+            $user->delete();
             return response()->json([
-                "data" => $category,
+                "data" => $user,
                 "status" => 200,
                 "success" => true,
-                "message" => "Successfully deleted category."
+                "message" => "Successfully deleted user."
             ]);
         } catch (\Throwable $th) {
             return response()->json([
