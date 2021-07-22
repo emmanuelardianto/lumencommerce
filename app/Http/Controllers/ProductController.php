@@ -14,11 +14,12 @@ class ProductController extends Controller
     {
         try {
             $search = $request->get('search');
+            $perPage = $request->get('per_page');
             $products = Product::orderBy('name');
             if(!is_null($search)) {
                 $products = $products->where('name', 'like', '%'.$search.'%');
             }
-            $products = $product->paginate(20);
+            $products = $products->paginate($perPage);
             return response()->json([
                 "data" => $products,
                 "status" => 200,
