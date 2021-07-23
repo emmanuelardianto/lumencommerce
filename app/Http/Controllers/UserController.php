@@ -13,11 +13,12 @@ class UserController extends Controller
     {
         try {
             $search = $request->get('search');
+            $perPage = $request->get('per_page');
             $users = User::orderBy('name');
             if(!is_null($search)) {
                 $users = $users->where('name', 'like', '%'.$search.'%');
             }
-            $users = $users->paginate(20);
+            $users = $users->paginate($perPage);
             return response()->json([
                 "data" => $users,
                 "status" => 200,
