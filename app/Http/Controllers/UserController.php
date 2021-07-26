@@ -74,7 +74,8 @@ class UserController extends Controller
                 'name' => $request->get('name'),
                 'is_admin' => $request->has('is_admin'),
                 'status' => $request->has('status'),
-                'password' => $request->has('password')
+                'password' => $request->has('password'),
+                'gender' => $request->get('gender')
             ]);
         
             $user->save();
