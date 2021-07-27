@@ -114,8 +114,9 @@ class UserController extends Controller
             $user = $user->fill([
                 'email' => $request->get('email'),
                 'name' => $request->get('name'),
-                'is_admin' => $request->has('is_admin'),
-                'status' => $request->has('status'),
+                'is_admin' => $request->get('is_admin'),
+                'status' => $request->get('status'),
+                'gender' => $request->get('gender')
             ]);
         
             $user->save();
