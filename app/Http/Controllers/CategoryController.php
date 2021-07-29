@@ -14,11 +14,15 @@ class CategoryController extends Controller
         try {
             $search = $request->get('search');
             $categories = Category::orderBy('name');
-            $perPage = $request->get('per_page');
             if(!is_null($search)) {
                 $categories = $categories->where('name', 'like', '%'.$search.'%');
             }
-            $categories = $categories->paginate($perPage);
+            if($request->get('isPagination') === 'false' ) {
+                $categories = $categories->get();
+            } else {
+                $perPage = $request->get('per_page');
+                $categories = $categories->paginate($perPage);  
+            } 
             return response()->json([
                 "data" => $categories,
                 "status" => 200,

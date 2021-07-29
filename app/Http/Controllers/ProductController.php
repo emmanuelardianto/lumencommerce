@@ -172,4 +172,23 @@ class ProductController extends Controller
             ]);
         }
     }
+
+    public function productAssets() {
+        try {
+            $data['colors'] = config('product.colors');
+            $data['sizes'] = config('product.sizes');
+            $data['categories'] = Category::orderBy('name')->get();
+            return response()->json([
+                "data" => $data,
+                "status" => 200,
+                "success" => true
+            ]);
+        } catch (\Throwable $th) {
+            return response()->json([
+                "status" => 200,
+                "success" => false,
+                "message" => $th->getMessage()
+            ]);
+        }
+    }
 }
