@@ -49,5 +49,19 @@ return [
             'name' => 'XXL',
             'value' => 'xxl'
         ],
+    ],
+    'genders' => [
+        [
+            'text' => 'Male',
+            'value' => 'male'
+        ],
+        [
+            'text' => 'Female',
+            'value' => 'female'
+        ],
+        [
+            'text' => 'Kids',
+            'value' => 'kids'
+        ]
     ]
 ];

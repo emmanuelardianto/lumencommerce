@@ -177,6 +177,7 @@ class ProductController extends Controller
         try {
             $data['colors'] = config('product.colors');
             $data['sizes'] = config('product.sizes');
+            $data['genders'] = config('product.genders');
             $data['categories'] = Category::orderBy('name')->get();
             return response()->json([
                 "data" => $data,
