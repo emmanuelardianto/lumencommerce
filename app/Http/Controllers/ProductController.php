@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Product;
+use App\Models\ProductVariant;
 use App\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -45,11 +46,11 @@ class ProductController extends Controller
     {
         try {
             $validator = Validator::make($request->all(), [
-                'category_id' => 'exists:categories,id',
+                'category' => 'exists:categories,id',
                 'name' => 'required|max:250',
-                'price' => 'required|numeric',
-                'status' => 'boolean',
-                'description' => 'max:1000'
+                'description' => 'max:1000',
+                'gender' => 'required',
+                'variant_type' => 'required'
             ]);
 
             if ($validator->fails()) {
@@ -63,15 +64,22 @@ class ProductController extends Controller
             $product = new Product();
     
             $product = $product->fill([
-                'category_id' => $request->get('category_id'),
+                'category_id' => $request->get('category'),
                 'name' => $request->get('name'),
                 'slug' => Str::slug($request->get('name')),
                 'description' => $request->get('description'),
-                'status' => $request->get('status'),
-                'price' => $request->get('price'),
+                'gender' => $request->get('gender'),
+                'variant_type' => $request->get('variant_type')
             ]);
         
             $product->save();
+            $variants = collect($request->get('variants'))->map(function($item) use($product) {
+                $item['product_id'] = $product->id;
+                return $item;
+            });
+
+            ProductVariant::insert($variants->toArray());
+
             return response()->json([
                 "data" => $product,
                 "status" => 200,
