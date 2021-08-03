@@ -40,4 +40,12 @@ class Product extends Model
     public function getCategoryAttribute() {
         return \App\Models\Category::where('id', $this->category_id)->first();
     }
+
+    public function category() {
+        return $this->belongsTo(\App\Models\Category::class);
+    }
+
+    public function product_variants() {
+        return $this->hasMany(\App\Models\ProductVariant::class);
+    }
 }

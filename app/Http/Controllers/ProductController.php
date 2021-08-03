@@ -16,7 +16,7 @@ class ProductController extends Controller
         try {
             $search = $request->get('search');
             $perPage = $request->get('per_page');
-            $products = Product::orderBy('name');
+            $products = Product::with('category:id,name')->orderBy('name');
             if(!is_null($search)) {
                 $products = $products->where('name', 'like', '%'.$search.'%');
             }
@@ -38,7 +38,7 @@ class ProductController extends Controller
     }
 
     public function getById($id) {
-        $product = Product::where('id', $id)->first();
+        $product = Product::with('product_variants')->where('id', $id)->first();
         return response()->json($product);
     }
 
