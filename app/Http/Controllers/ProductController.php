@@ -16,7 +16,10 @@ class ProductController extends Controller
         try {
             $search = $request->get('search');
             $perPage = $request->get('per_page');
+            $category = $request->get('category_id');
             $products = Product::with('category:id,name')->orderBy('name');
+            if(!is_null($category))
+                $products = $products->where('category_id', $category);
             if(!is_null($search)) {
                 $products = $products->where('name', 'like', '%'.$search.'%');
             }
