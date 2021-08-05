@@ -18,7 +18,11 @@ class Category extends Model
         return 'slug';
     }
 
-    public function getProductsAttribute() {
-        return \App\Models\Product::where('category_id', $this->id)->where('status', 1)->paginate(24);
+    // public function getProductsAttribute() {
+    //     return \App\Models\Product::where('category_id', $this->id)->where('status', 1)->paginate(24);
+    // }
+
+    public function products() {
+        return $this->hasMany(\App\Models\Product::class);
     }
 }

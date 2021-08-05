@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Category;
+use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Validator;
@@ -13,7 +14,7 @@ class CategoryController extends Controller
     {
         try {
             $search = $request->get('search');
-            $categories = Category::orderBy('name');
+            $categories = Category::with('products')->orderBy('name');
             if(!is_null($search)) {
                 $categories = $categories->where('name', 'like', '%'.$search.'%');
             }
@@ -153,6 +154,43 @@ class CategoryController extends Controller
 
         
             $category->delete();
+            return response()->json([
+                "data" => $category,
+                "status" => 200,
+                "success" => true,
+                "message" => "Successfully deleted category."
+            ]);
+        } catch (\Throwable $th) {
+            return response()->json([
+                "status" => 200,
+                "success" => false,
+                "message" => $th->getMessage()
+            ]);
+        }
+    }
+
+    public function getCategoryWithProduct(Request $request) {
+        try {
+            $validator = Validator::make($request->all(), [
+                'id' => 'required'
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    "status" => 401,
+                    "success" => false,
+                ]);
+            }
+            
+            $category = Category::where('id', $request->get('id'))->first();
+            if (is_null($category)) {
+                return response()->json([
+                    "status" => 401,
+                    "success" => false,
+                ]);
+            }
+            $products = Product::with('product_variants')->where('category_id', $category->id)->paginate(20);
+            $category['products'] = $products;
             return response()->json([
                 "data" => $category,
                 "status" => 200,
