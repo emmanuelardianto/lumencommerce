@@ -14,7 +14,11 @@ class CategoryController extends Controller
     {
         try {
             $search = $request->get('search');
-            $categories = Category::with('products')->orderBy('name');
+            $withProduct = $request->get('with_product');
+            $categories = Category::orderBy('name');
+            if(!is_null($withProduct)) {
+                $categories = $categories->with('products');
+            }
             if(!is_null($search)) {
                 $categories = $categories->where('name', 'like', '%'.$search.'%');
             }
@@ -60,6 +64,7 @@ class CategoryController extends Controller
         try {
             $validator = Validator::make($request->all(), [
                 'name' => 'required|max:250',
+                'gender' => 'required'
             ]);
 
             if ($validator->fails()) {
@@ -74,6 +79,7 @@ class CategoryController extends Controller
     
             $category = $category->fill([
                 'name' => $request->get('name'),
+                'gender' => $request->get('gender')
             ]);
         
             $category->save();
@@ -97,6 +103,7 @@ class CategoryController extends Controller
             $validator = Validator::make($request->all(), [
                 'id' => 'required',
                 'name' => 'required|max:250',
+                'gender' => 'required'
             ]);
 
             if ($validator->fails()) {
@@ -111,6 +118,7 @@ class CategoryController extends Controller
     
             $category = $category->fill([
                 'name' => $request->get('name'),
+                'gender' => $request->get('gender')
             ]);
         
             $category->save();

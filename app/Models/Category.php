@@ -11,8 +11,11 @@ class Category extends Model
 
     protected $fillable = [
         'name',
-        'slug'
+        'slug',
+        'gender'
     ];
+
+    protected $casts = ['gender' => 'json'];
 
     public function getRouteKeyName() {
         return 'slug';
@@ -24,5 +27,8 @@ class Category extends Model
 
     public function products() {
         return $this->hasMany(\App\Models\Product::class);
+    }
+    public function getGenderAttribute($value) {
+        return json_decode($value, true);
     }
 }
