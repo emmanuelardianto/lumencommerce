@@ -42,3 +42,10 @@ $router->group([ 'prefix' => 'user'], function () use($router) {
     $router->post('/delete', 'UserController@delete');
     $router->post('/update', 'UserController@update');
 });
+
+$router->group([ 'prefix' => 'product-variant-ref'], function () use($router) {
+    $router->get('/', 'ProductVariantRefController@list');
+    $router->get('/{id}', 'ProductVariantRefController@getById');
+    $router->post('/create', 'ProductVariantRefController@create');
+    $router->post('/update', 'ProductVariantRefController@update');
+});
