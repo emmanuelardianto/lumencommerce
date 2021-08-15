@@ -11,12 +11,18 @@ class ProductVariantRefController extends Controller {
     public function list(Request $request) {
         try {
             $search = $request->get('search');
-            $productsVairantRef = ProductVariantRef::orderBy('name');
+            $productsVariantRef = ProductVariantRef::orderBy('name');
             if(!is_null($search)) {
-                $productsVairantRef = $productsVairantRef->where('name', 'like', '%'.$search.'%');
+                $productsVariantRef = $productsVariantRef->where('name', 'like', '%'.$search.'%');
             }
+            if($request->get('isPagination') === 'false' ) {
+                $productsVariantRef = $productsVariantRef->get();
+            } else {
+                $perPage = $request->get('per_page');
+                $productsVariantRef = $productsVariantRef->paginate($perPage);  
+            } 
             return response()->json([
-                "data" => $productsVairantRef->get(),
+                "data" => $productsVariantRef,
                 "status" => 200,
                 "success" => true
             ]);
@@ -32,7 +38,7 @@ class ProductVariantRefController extends Controller {
     public function getById($id) {
         try {
             return response()->json([
-                "data" => ProductVariantRef::find($id)->get(),
+                "data" => ProductVariantRef::where('id', $id)->first(),
                 "status" => 200,
                 "success" => true
             ]);
