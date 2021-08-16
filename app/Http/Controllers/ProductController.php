@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Product;
 use App\Models\ProductVariant;
+use App\Models\ProductVariantRef;
 use App\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -186,8 +187,8 @@ class ProductController extends Controller
 
     public function productAssets() {
         try {
-            $data['colors'] = config('product.colors');
-            $data['sizes'] = config('product.sizes');
+            $data['colors'] = ProductVariantRef::where('name', 'color')->get();
+            $data['sizes'] = ProductVariantRef::where('name', 'size')->get();
             $data['genders'] = config('product.genders');
             $data['categories'] = Category::orderBy('name')->get();
             return response()->json([

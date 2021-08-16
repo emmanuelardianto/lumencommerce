@@ -23,7 +23,7 @@ $router->group([ 'prefix' => 'product'], function () use($router) {
     $router->post('/create', 'ProductController@create');
     $router->post('/delete', 'ProductController@delete');
     $router->post('/update', 'ProductController@update');
-    $router->get('/update/assets', 'ProductController@productAssets');
+    $router->get('/get/assets', 'ProductController@productAssets');
 });
 
 $router->group([ 'prefix' => 'category'], function () use($router) {
