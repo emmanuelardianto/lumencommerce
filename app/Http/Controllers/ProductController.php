@@ -103,11 +103,10 @@ class ProductController extends Controller
         try {
             $validator = Validator::make($request->all(), [
                 'id' => 'required|exists:products,id',
-                'category_id' => 'exists:categories,id',
+                'category' => 'exists:categories,id',
                 'name' => 'required|max:250',
-                'price' => 'required|numeric',
-                'status' => 'boolean',
-                'description' => 'max:1000'
+                'description' => 'max:1000',
+                'gender' => 'required',
             ]);
 
             if ($validator->fails()) {
@@ -121,15 +120,24 @@ class ProductController extends Controller
             $product = Product::where('id', $request->get('id'))->first();
     
             $product = $product->fill([
-                'category_id' => $request->get('category_id'),
+                'category_id' => $request->get('category'),
                 'name' => $request->get('name'),
                 'slug' => Str::slug($request->get('name')),
                 'description' => $request->get('description'),
-                'status' => $request->get('status'),
-                'price' => $request->get('price'),
+                'gender' => $request->get('gender'),
             ]);
         
             $product->save();
+            $variants = collect($request->get('variants'))->where('id', null)->map(function($item) use($product) {
+                $item['product_id'] = $product->id;
+                return $item;
+            });
+
+            ProductVariant::insert($variants->toArray());
+            foreach(collect($request->get('variants')) as $exist) {
+                ProductVariant::where('id', $exist['id'])->update($exist);
+            }
+            
             return response()->json([
                 "data" => $product,
                 "status" => 200,
