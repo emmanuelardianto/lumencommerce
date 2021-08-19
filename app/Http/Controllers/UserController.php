@@ -6,6 +6,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Validator;
+use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
@@ -74,7 +75,7 @@ class UserController extends Controller
                 'name' => $request->get('name'),
                 'is_admin' => $request->has('is_admin'),
                 'status' => $request->has('status'),
-                'password' => $request->has('password'),
+                'password' => Hash::make($request->get('password')),
                 'gender' => $request->get('gender')
             ]);
         

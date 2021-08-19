@@ -20,6 +20,7 @@ $router->get('/', function () use ($router) {
 $router->group([ 'prefix' => 'product'], function () use($router) {
     $router->get('/', 'ProductController@list');
     $router->get('/{id}', 'ProductController@getById');
+    $router->get('/detail/{slug}', 'ProductController@getBySlug');
     $router->post('/create', 'ProductController@create');
     $router->post('/delete', 'ProductController@delete');
     $router->post('/update', 'ProductController@update');
@@ -48,4 +49,9 @@ $router->group([ 'prefix' => 'product-variant-ref'], function () use($router) {
     $router->get('/{id}', 'ProductVariantRefController@getById');
     $router->post('/create', 'ProductVariantRefController@create');
     $router->post('/update', 'ProductVariantRefController@update');
+});
+
+
+$router->group([ 'prefix' => 'auth'], function () use($router) { 
+    $router->post('/login', 'AuthController@login');
 });

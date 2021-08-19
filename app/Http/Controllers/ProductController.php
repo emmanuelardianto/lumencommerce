@@ -37,13 +37,50 @@ class ProductController extends Controller
                 "message" => $th->getMessage()
             ]);
         }
-        
-
     }
 
     public function getById($id) {
-        $product = Product::with('product_variants')->where('id', $id)->first();
-        return response()->json($product);
+        try {
+            $product = Product::with('product_variants')->where('id', $id)->first();
+            $variantValue1ds = (collect($product->product_variants)->pluck('variant_value1'))->concat(collect($product->product_variants)->pluck('variant_value2'))->unique();
+            $productVariantRefs = ProductVariantRef::whereIn('id', $variantValue1ds->toArray())->get();
+            return response()->json([
+                "data" => [
+                    "product" => $product,
+                    "assets" => $productVariantRefs
+                ],
+                "status" => 200,
+                "success" => true
+            ]);
+        } catch (\Throwable $th) {
+            return response()->json([
+                "status" => 200,
+                "success" => false,
+                "message" => $th->getMessage()
+            ]);
+        }
+    }
+
+    public function getBySlug($slug) {
+        try {
+            $product = Product::with('product_variants')->where('slug', $slug)->first();
+            $variantValue1ds = (collect($product->product_variants)->pluck('variant_value1'))->concat(collect($product->product_variants)->pluck('variant_value2'))->unique();
+            $productVariantRefs = ProductVariantRef::whereIn('id', $variantValue1ds->toArray())->get();
+            return response()->json([
+                "data" => [
+                    "product" => $product,
+                    "assets" => $productVariantRefs
+                ],
+                "status" => 200,
+                "success" => true
+            ]);
+        } catch (\Throwable $th) {
+            return response()->json([
+                "status" => 200,
+                "success" => false,
+                "message" => $th->getMessage()
+            ]);
+        }
     }
 
     public function create(Request $request)
