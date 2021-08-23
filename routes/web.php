@@ -30,6 +30,7 @@ $router->group([ 'prefix' => 'product'], function () use($router) {
 $router->group([ 'prefix' => 'category'], function () use($router) {
     $router->get('/', 'CategoryController@list');
     $router->get('/{id}', 'CategoryController@getById');
+    $router->get('/detail/{slug}', 'CategoryController@getBySlug');
     $router->post('/create', 'CategoryController@create');
     $router->post('/delete', 'CategoryController@delete');
     $router->post('/update', 'CategoryController@update');

@@ -59,6 +59,23 @@ class CategoryController extends Controller
         }
     }
 
+    public function getBySlug($slug) {
+        try {
+            $category = Category::where('slug', $slug)->first();
+            return response()->json([
+                "data" => $category,
+                "status" => 200,
+                "success" => true
+            ]);
+        } catch (\Throwable $th) {
+            return response()->json([
+                "status" => 200,
+                "success" => false,
+                "message" => $th->getMessage()
+            ]);
+        }
+    }
+
     public function create(Request $request)
     {
         try {
@@ -79,7 +96,8 @@ class CategoryController extends Controller
     
             $category = $category->fill([
                 'name' => $request->get('name'),
-                'gender' => $request->get('gender')
+                'gender' => $request->get('gender'),
+                'slug' => Str::slug($request->get('name')),
             ]);
         
             $category->save();
@@ -118,7 +136,8 @@ class CategoryController extends Controller
     
             $category = $category->fill([
                 'name' => $request->get('name'),
-                'gender' => $request->get('gender')
+                'gender' => $request->get('gender'),
+                'slug' => Str::slug($request->get('name')),
             ]);
         
             $category->save();
@@ -180,7 +199,7 @@ class CategoryController extends Controller
     public function getCategoryWithProduct(Request $request) {
         try {
             $validator = Validator::make($request->all(), [
-                'id' => 'required'
+                'slug' => 'required'
             ]);
 
             if ($validator->fails()) {
@@ -190,7 +209,7 @@ class CategoryController extends Controller
                 ]);
             }
             
-            $category = Category::where('id', $request->get('id'))->first();
+            $category = Category::where('slug', $request->get('slug'))->first();
             if (is_null($category)) {
                 return response()->json([
                     "status" => 401,
