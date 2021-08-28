@@ -74,7 +74,6 @@ $app->configure('product');
 */
 
 $app->middleware([
-    App\Http\Middleware\CorsMiddleware::class
 ]);
 
 $app->routeMiddleware([

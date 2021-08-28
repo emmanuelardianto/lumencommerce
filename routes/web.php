@@ -13,6 +13,10 @@
 |
 */
 
+header('Access-Control-Allow-Methods: GET, POST, PATCH, PUT, DELETE, OPTIONS');
+header('Access-Control-Allow-Headers: Origin, Content-Type, X-Auth-Token, Authorization, Accept,charset,boundary,Content-Length');
+header('Access-Control-Allow-Origin: *');
+
 $router->get('/', function () use ($router) {
     return $router->app->version();
 });
@@ -53,7 +57,12 @@ $router->group([ 'prefix' => 'product-variant-ref'], function () use($router) {
 });
 
 
-$router->group([ 'prefix' => 'auth'], function () use($router) { 
+$router->group(['prefix' => 'auth'], function () use($router) { 
     $router->post('/login', 'AuthController@login');
     $router->post('/register', 'AuthController@register');
+});
+
+$router->group(['middleware' => ['auth:api'], 'prefix' => 'auth'], function () use($router) { 
+    $router->post('logout', 'AuthController@logout');
+    $router->get('/me', 'AuthController@me');
 });
