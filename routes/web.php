@@ -13,9 +13,9 @@
 |
 */
 
-header('Access-Control-Allow-Methods: GET, POST, PATCH, PUT, DELETE, OPTIONS');
-header('Access-Control-Allow-Headers: Origin, Content-Type, X-Auth-Token, Authorization, Accept,charset,boundary,Content-Length');
-header('Access-Control-Allow-Origin: *');
+// header('Access-Control-Allow-Methods: GET, POST, PATCH, PUT, DELETE, OPTIONS');
+// header('Access-Control-Allow-Headers: Origin, Content-Type, X-Auth-Token, Authorization, Accept,charset,boundary,Content-Length');
+// header('Access-Control-Allow-Origin: *');
 
 $router->get('/', function () use ($router) {
     return $router->app->version();
@@ -47,6 +47,14 @@ $router->group([ 'prefix' => 'user'], function () use($router) {
     $router->post('/create', 'UserController@create');
     $router->post('/delete', 'UserController@delete');
     $router->post('/update', 'UserController@update');
+});
+
+$router->group([ 'prefix' => 'address'], function () use($router) {
+    $router->get('/', 'AddressController@list');
+    $router->get('/{id}', 'AddressController@getById');
+    $router->post('/create', 'AddressController@create');
+    $router->post('/delete', 'AddressController@delete');
+    $router->post('/update', 'AddressController@update');
 });
 
 $router->group([ 'prefix' => 'product-variant-ref'], function () use($router) {
