@@ -16,7 +16,7 @@ class Address extends Model
         'first_name_kana',
         'last_name_kana',
         'zip_code',
-        'perfecture',
+        'prefecture',
         'city',
         'address1',
         'address2',
