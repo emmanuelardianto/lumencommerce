@@ -195,4 +195,46 @@ class AddressController extends Controller
             ]);
         }
     }
+
+    public function setDefault(Request $request)
+    {
+        try {
+            $validator = Validator::make($request->all(), [
+                'id' => 'required',
+                'user_id' => 'required|exists:users,id',
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    "status" => 401,
+                    "success" => false,
+                    "message" => $validator->errors()->all()
+                ]);
+            }
+            $address = Address::where('id', $request->get('id'))->first();
+            if (is_null($address)) {
+                return response()->json([
+                    "status" => 401,
+                    "success" => false,
+                    "message" => "Data not found."
+                ]);
+            }
+
+            Address::where('user_id', $request->get('user_id'))->update(['default' => false]);
+            $address->default = true;
+            $address->save();
+            return response()->json([
+                "data" => $address,
+                "status" => 200,
+                "success" => true,
+                "message" => "Successfully set address as default."
+            ]);
+        } catch (\Throwable $th) {
+            return response()->json([
+                "status" => 200,
+                "success" => false,
+                "message" => $th->getMessage()
+            ]);
+        }
+    }
 }

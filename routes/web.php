@@ -55,6 +55,7 @@ $router->group([ 'prefix' => 'address'], function () use($router) {
     $router->post('/create', 'AddressController@create');
     $router->post('/delete', 'AddressController@delete');
     $router->post('/update', 'AddressController@update');
+    $router->post('/default', 'AddressController@setDefault');
 });
 
 $router->group([ 'prefix' => 'product-variant-ref'], function () use($router) {
