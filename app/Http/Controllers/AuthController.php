@@ -95,4 +95,46 @@ class AuthController extends Controller
             'expires_in' => auth('users')->factory()->getTTL() * 60
         ]);
     }
+
+    public function changePassword(Request $request) {
+        try {
+            $validator = Validator::make($request->all(), [
+                'id' => 'required|exists:users',
+                'password' => 'required',
+                'old_password' => 'required',
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    "status" => 401,
+                    "success" => false,
+                    "message" => $validator->errors()->all()
+                ]);
+            }
+
+            $user = User::where('id', $request->get('id'))->first();
+
+            if(!Hash::check($request->get('old_password'), $user->password)) {
+                return response()->json([
+                    "status" => 401,
+                    "success" => false,
+                    "message" => 'User Id or Password doesn\'t match'
+                ]);
+            }
+            $user->password = Hash::make($request->get('passworod'));
+            $user->save();
+
+            return response()->json([
+                "message" => "Successfuly changed password.",
+                "status" => 200,
+                "success" => true
+            ]);
+        } catch (\Throwable $th) {
+            return response()->json([
+                "status" => 200,
+                "success" => false,
+                "message" => $th->getMessage()
+            ]);
+        }
+    }
 }

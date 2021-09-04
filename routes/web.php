@@ -69,6 +69,7 @@ $router->group([ 'prefix' => 'product-variant-ref'], function () use($router) {
 $router->group(['prefix' => 'auth'], function () use($router) { 
     $router->post('/login', 'AuthController@login');
     $router->post('/register', 'AuthController@register');
+    $router->post('/change-password', 'AuthController@changePassword');
 });
 
 $router->group(['middleware' => ['auth:api'], 'prefix' => 'auth'], function () use($router) { 
