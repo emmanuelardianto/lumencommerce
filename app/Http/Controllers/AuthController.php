@@ -8,6 +8,9 @@ use Validator;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Str;
+use Carbon\Carbon;
 
 class AuthController extends Controller
 {
@@ -126,6 +129,42 @@ class AuthController extends Controller
 
             return response()->json([
                 "message" => "Successfuly changed password.",
+                "status" => 200,
+                "success" => true
+            ]);
+        } catch (\Throwable $th) {
+            return response()->json([
+                "status" => 200,
+                "success" => false,
+                "message" => $th->getMessage()
+            ]);
+        }
+    }
+
+    public function forgotPassword(Request $request) {
+        try {
+            $validator = Validator::make($request->all(), [
+                'email' => 'required|exists:users',
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    "status" => 401,
+                    "success" => false,
+                    "message" => $validator->errors()->all()
+                ]);
+            }
+
+            \DB::table('password_resets')->insert([
+                'email' => $request->email,
+                'token' => Str::random(40),
+                'created_at' => Carbon::now()
+            ]);
+
+            //send email
+
+            return response()->json([
+                "message" => "Succesfully created token",
                 "status" => 200,
                 "success" => true
             ]);
