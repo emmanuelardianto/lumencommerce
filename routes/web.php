@@ -71,6 +71,7 @@ $router->group(['prefix' => 'auth'], function () use($router) {
     $router->post('/register', 'AuthController@register');
     $router->post('/change-password', 'AuthController@changePassword');
     $router->post('/forgot-password', 'AuthController@forgotPassword');
+    $router->post('/reset-password', 'AuthController@resetPassword');
 });
 
 $router->group(['middleware' => ['auth:api'], 'prefix' => 'auth'], function () use($router) { 

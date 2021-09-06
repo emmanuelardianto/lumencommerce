@@ -124,7 +124,7 @@ class AuthController extends Controller
                     "message" => 'User Id or Password doesn\'t match'
                 ]);
             }
-            $user->password = Hash::make($request->get('passworod'));
+            $user->password = Hash::make($request->get('password'));
             $user->save();
 
             return response()->json([
@@ -165,6 +165,47 @@ class AuthController extends Controller
 
             return response()->json([
                 "message" => "Succesfully created token",
+                "status" => 200,
+                "success" => true
+            ]);
+        } catch (\Throwable $th) {
+            return response()->json([
+                "status" => 200,
+                "success" => false,
+                "message" => $th->getMessage()
+            ]);
+        }
+    }
+
+    public function resetPassword(Request $request) {
+        try {
+            $validator = Validator::make($request->all(), [
+                'token' => 'required|exists:password_resets',
+                'email' => 'required|exists:password_resets',
+                'password' => 'required'
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    "status" => 401,
+                    "success" => false,
+                    "message" => $validator->errors()->all()
+                ]);
+            }
+
+            \DB::table('password_resets')
+                        ->where('token', $request->get('token'))
+                        ->where('email', $request->get('email'))
+                        ->delete();
+            
+                        $user = User::where('email', $request->get('email'))->first();
+            $user->password = Hash::make($request->get('password'));
+            $user->save();
+
+            //send email
+
+            return response()->json([
+                "message" => "Succesfully reset password",
                 "status" => 200,
                 "success" => true
             ]);
