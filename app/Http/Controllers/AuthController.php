@@ -194,11 +194,10 @@ class AuthController extends Controller
             }
 
             \DB::table('password_resets')
-                        ->where('token', $request->get('token'))
                         ->where('email', $request->get('email'))
                         ->delete();
             
-                        $user = User::where('email', $request->get('email'))->first();
+            $user = User::where('email', $request->get('email'))->first();
             $user->password = Hash::make($request->get('password'));
             $user->save();
 
