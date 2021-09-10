@@ -216,4 +216,47 @@ class AuthController extends Controller
             ]);
         }
     }
+
+    public function validateToken(Request $request) {
+        try {
+            $validator = Validator::make($request->all(), [
+                'token' => 'required|exists:password_resets',
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    "status" => 401,
+                    "success" => false,
+                    "message" => $validator->errors()->all()
+                ]);
+            }
+
+            $token = \DB::table('password_resets')
+                        ->where('token', $request->get('token'))
+                        ->where('created_at', '>', Carbon::now()->addHours(-2))
+                        ->first();
+            
+            if(is_null($token)) {
+                return response()->json([
+                    "status" => 401,
+                    "success" => false,
+                    "message" => "Token invalid"
+                ]);
+            }
+            
+
+            return response()->json([
+                "message" => "Token valid",
+                "data" => $token,
+                "status" => 200,
+                "success" => true
+            ]);
+        } catch (\Throwable $th) {
+            return response()->json([
+                "status" => 200,
+                "success" => false,
+                "message" => $th->getMessage()
+            ]);
+        }
+    }
 }
