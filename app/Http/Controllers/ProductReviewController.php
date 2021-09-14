@@ -9,24 +9,54 @@ use Validator;
 
 class ProductReviewController extends Controller
 {
-    public function list(Request $request)
+    public function listByUser(Request $request)
     {
         try {
-            $search = $request->get('search');
-            $withProduct = $request->get('with_product');
-            $product_reviews = ProductReview::orderBy('name');
-            if(!is_null($withProduct)) {
-                $product_reviews = $product_reviews->with('products');
+            $validator = Validator::make($request->all(), [
+                'user_id' => 'required|exists:users,id',
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    "status" => 401,
+                    "success" => false,
+                    "message" => $validator->errors()->all()
+                ]);
             }
-            if(!is_null($search)) {
-                $product_reviews = $product_reviews->where('name', 'like', '%'.$search.'%');
+
+            $product_reviews = ProductReview::where('user_id', $request->get('user_id'))->get();
+
+            return response()->json([
+                "data" => $product_reviews,
+                "status" => 200,
+                "success" => true
+            ]);
+        } catch (\Throwable $th) {
+            return response()->json([
+                "status" => 200,
+                "success" => false,
+                "message" => $th->getMessage()
+            ]);
+        }
+    }
+
+    public function listByProduct(Request $request)
+    {
+        try {
+            $validator = Validator::make($request->all(), [
+                'product_id' => 'required|exists:products,id',
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    "status" => 401,
+                    "success" => false,
+                    "message" => $validator->errors()->all()
+                ]);
             }
-            if($request->get('isPagination') === 'false' ) {
-                $product_reviews = $product_reviews->get();
-            } else {
-                $perPage = $request->get('per_page');
-                $product_reviews = $product_reviews->paginate($perPage);  
-            } 
+
+            $product_reviews = ProductReview::where('product_id', $request->get('product_id'))->get();
+
             return response()->json([
                 "data" => $product_reviews,
                 "status" => 200,
