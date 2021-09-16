@@ -66,11 +66,16 @@ $router->group([ 'prefix' => 'product-variant-ref'], function () use($router) {
 });
 
 $router->group([ 'prefix' => 'product-review'], function () use($router) {
-    $router->get('/{id}', 'ProductReviewController@getById');
     $router->post('/create', 'ProductReviewController@create');
-    $router->post('/update', 'ProductReviewController@update');
     $router->post('/by-user', 'ProductReviewController@listByUser');
     $router->post('/by-product', 'ProductReviewController@listByProduct');
+    $router->post('/delete', 'ProductReviewController@delete');
+});
+
+$router->group([ 'prefix' => 'wishlist'], function () use($router) {
+    $router->post('/create', 'WishlistController@create');
+    $router->post('/list', 'WishlistController@list');
+    $router->post('/delete', 'WishlistController@delete');
 });
 
 
