@@ -13,18 +13,6 @@ class WishlistController extends Controller
     public function list(Request $request)
     {
         try {
-            $validator = Validator::make($request->all(), [
-                'user_id' => 'exists:wishlists, user_id',
-            ]);
-
-            if ($validator->fails()) {
-                return response()->json([
-                    "status" => 401,
-                    "success" => false,
-                    "message" => $validator->errors()->all()
-                ]);
-            }
-
             $wishlists = Wishlist::orderBy('created_at')->where('user_id', $request->get('user_id'))->get();
             return response()->json([
                 "data" => $wishlists,
@@ -44,9 +32,9 @@ class WishlistController extends Controller
     {
         try {
             $validator = Validator::make($request->all(), [
-                'user_id' => 'required|exists:users, id',
-                'product_id' => 'required|exists:products, id',
-                'product_variant_id' => 'required|exists:product_variants, id',
+                'user_id' => 'required|exists:users,id',
+                'product_id' => 'required|exists:products,id',
+                'product_variant_id' => 'required|exists:product_variants,id',
             ]);
 
             if ($validator->fails()) {
