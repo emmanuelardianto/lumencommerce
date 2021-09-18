@@ -13,7 +13,7 @@ class WishlistController extends Controller
     public function list(Request $request)
     {
         try {
-            $wishlists = Wishlist::orderBy('created_at')->where('user_id', $request->get('user_id'))->get();
+            $wishlists = Wishlist::with(['product', 'product_variant'])->orderBy('created_at')->where('user_id', $request->get('user_id'))->get();
             return response()->json([
                 "data" => $wishlists,
                 "status" => 200,

@@ -14,4 +14,12 @@ class Wishlist extends Model
         'product_id',
         'product_variant_id'
     ];
+
+    public function product() {
+        return $this->belongsTo(\App\Models\Product::class);
+    }
+
+    public function product_variant() {
+        return $this->belongsTo(\App\Models\ProductVariant::class);
+    }
 }
