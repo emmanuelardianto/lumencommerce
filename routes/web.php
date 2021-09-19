@@ -73,9 +73,8 @@ $router->group([ 'prefix' => 'product-review'], function () use($router) {
 });
 
 $router->group([ 'prefix' => 'wishlist'], function () use($router) {
-    $router->post('/create', 'WishlistController@create');
+    $router->post('/toggle', 'WishlistController@toggle');
     $router->post('/list', 'WishlistController@list');
-    $router->post('/delete', 'WishlistController@delete');
 });
 
 

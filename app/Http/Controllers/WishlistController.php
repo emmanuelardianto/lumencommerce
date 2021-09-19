@@ -28,9 +28,27 @@ class WishlistController extends Controller
         }
     }
 
-    public function create(Request $request)
+    public function toggle(Request $request)
     {
         try {
+            if(!is_null($request->get('id'))) {
+                $wishlist = Wishlist::where('id', $request->get('id'))->first();
+                if (is_null($wishlist)) {
+                    return response()->json([
+                        "status" => 401,
+                        "success" => false,
+                        "message" => "Data not found."
+                    ]);
+                }
+            
+                $wishlist->delete();
+                return response()->json([
+                    "data" => $wishlist,
+                    "status" => 200,
+                    "success" => true,
+                    "message" => "Successfully deleted wishlist."
+                ]);
+            }
             $validator = Validator::make($request->all(), [
                 'user_id' => 'required|exists:users,id',
                 'product_id' => 'required|exists:products,id',
@@ -58,46 +76,6 @@ class WishlistController extends Controller
                 "data" => $wishlist,
                 "status" => 200,
                 "success" => true
-            ]);
-        } catch (\Throwable $th) {
-            return response()->json([
-                "status" => 200,
-                "success" => false,
-                "message" => $th->getMessage()
-            ]);
-        }
-    }
-
-    public function delete(Request $request)
-    {
-        try {
-            $validator = Validator::make($request->all(), [
-                'id' => 'required'
-            ]);
-
-            if ($validator->fails()) {
-                return response()->json([
-                    "status" => 401,
-                    "success" => false,
-                    "message" => $validator->errors()->all()
-                ]);
-            }
-            
-            $wishlist = Wishlist::where('id', $request->get('id'))->first();
-            if (is_null($wishlist)) {
-                return response()->json([
-                    "status" => 401,
-                    "success" => false,
-                    "message" => "Data not found."
-                ]);
-            }
-        
-            $wishlist->delete();
-            return response()->json([
-                "data" => $wishlist,
-                "status" => 200,
-                "success" => true,
-                "message" => "Successfully deleted wishlist."
             ]);
         } catch (\Throwable $th) {
             return response()->json([
