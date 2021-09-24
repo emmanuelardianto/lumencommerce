@@ -13,9 +13,12 @@ class WishlistController extends Controller
     public function list(Request $request)
     {
         try {
-            $wishlists = Wishlist::with(['product', 'product_variant'])->orderBy('created_at')->where('user_id', $request->get('user_id'))->get();
+            $wishlists = Wishlist::with(['product', 'product_variant'])->orderBy('created_at')->where('user_id', $request->get('user_id'));
+            if($request->get('product_id')) {
+                $wishlists = $wishlists->where('product_id', $request->get('product_id'));
+            }
             return response()->json([
-                "data" => $wishlists,
+                "data" => $wishlists->get(),
                 "status" => 200,
                 "success" => true
             ]);
@@ -31,35 +34,17 @@ class WishlistController extends Controller
     public function toggle(Request $request)
     {
         try {
-            if(!is_null($request->get('id'))) {
-                $wishlist = Wishlist::where('id', $request->get('id'))->first();
-                if (is_null($wishlist)) {
-                    return response()->json([
-                        "status" => 401,
-                        "success" => false,
-                        "message" => "Data not found."
-                    ]);
-                }
-            
-                $wishlist->delete();
+            $wishlists = Wishlist::where('user_id', $request->get('user_id'))
+                                    ->where('product_id', $request->get('product_id'))
+                                    ->where('product_variant_id', $request->get('product_variant_id'));
+
+            if(count($wishlists->get()) > 0){
+                $wishlists->delete();
                 return response()->json([
-                    "data" => $wishlist,
+                    "data" => $wishlists,
                     "status" => 200,
                     "success" => true,
                     "message" => "Successfully deleted wishlist."
-                ]);
-            }
-            $validator = Validator::make($request->all(), [
-                'user_id' => 'required|exists:users,id',
-                'product_id' => 'required|exists:products,id',
-                'product_variant_id' => 'required|exists:product_variants,id',
-            ]);
-
-            if ($validator->fails()) {
-                return response()->json([
-                    "status" => 401,
-                    "success" => false,
-                    "message" => $validator->errors()->all()
                 ]);
             }
             
@@ -75,7 +60,8 @@ class WishlistController extends Controller
             return response()->json([
                 "data" => $wishlist,
                 "status" => 200,
-                "success" => true
+                "success" => true,
+                "message" => "Added to wishlist."
             ]);
         } catch (\Throwable $th) {
             return response()->json([
