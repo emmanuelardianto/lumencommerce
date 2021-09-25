@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Product;
+use App\Models\Collection;
+use App\Models\CollectionItem;
 use App\Models\ProductVariant;
 use App\Models\ProductVariantRef;
 use App\Models\Category;
@@ -121,6 +123,16 @@ class ProductController extends Controller
 
             ProductVariant::insert($variants->toArray());
 
+            if(!is_null($request->get('collections'))) {
+                $items = collect($request->get('collections'))->map(function($item) use ($product) {
+                    return [
+                        'product_id' => $product->id,
+                        'collection_id' => $item
+                    ];
+                });
+                CollectionItem::insert($items->toArray());  
+            }
+
             return response()->json([
                 "data" => $product,
                 "status" => 200,
@@ -236,6 +248,7 @@ class ProductController extends Controller
             $data['sizes'] = ProductVariantRef::where('name', 'size')->get();
             $data['genders'] = config('product.genders');
             $data['categories'] = Category::orderBy('name')->get();
+            $data['collections'] = Collection::orderBy('title')->get();
             return response()->json([
                 "data" => $data,
                 "status" => 200,

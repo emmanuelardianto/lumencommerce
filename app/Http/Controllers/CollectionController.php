@@ -37,6 +37,23 @@ class CollectionController extends Controller
         }
     }
 
+    public function getById($id)
+    {
+        try {
+            return response()->json([
+                "data" => Collection::where('id', $id)->first(),
+                "status" => 200,
+                "success" => true
+            ]);
+        } catch (\Throwable $th) {
+            return response()->json([
+                "status" => 200,
+                "success" => false,
+                "message" => $th->getMessage()
+            ]);
+        }
+    }
+
     public function create(Request $request)
     {
         try {
@@ -66,7 +83,7 @@ class CollectionController extends Controller
                 $items = collect($request->get('items'))->map(function($item) use ($collection) {
                     return [
                         'collection_id' => $collection->id,
-                        'product_id' => $item['product_id']
+                        'product_id' => $item
                     ];
                 });
                 CollectionItem::insert($items->toArray());
