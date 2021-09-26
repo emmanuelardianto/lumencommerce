@@ -15,9 +15,9 @@ class CollectionController extends Controller
         try {
             $search = $request->get('search');
             $perPage = 20;
-            $collections = Collection::orderBy('name');
+            $collections = Collection::orderBy('title');
             if(!is_null($search)) {
-                $collections = $collections->where('name', 'like', '%'.$search.'%');
+                $collections = $collections->where('title', 'like', '%'.$search.'%');
             }
             if(!is_null($request->get('per_page'))) {
                 $perPage = $request->get('per_page');
