@@ -54,7 +54,7 @@ class CollectionController extends Controller
         }
     }
 
-    public function create(Request $request)
+    public function update(Request $request)
     {
         try {
             $validator = Validator::make($request->all(), [
@@ -68,8 +68,13 @@ class CollectionController extends Controller
                     "message" => $validator->errors()->all()
                 ]);
             }
-            
             $collection = new Collection();
+            if(!is_null($request->get('id'))) {
+                $collection = Collection::where('id', $request->get('id'))->first();
+                if(is_null($collection)) {
+                    $collection = new Collection();    
+                }
+            } 
     
             $collection = $collection->fill([
                 'title' => $request->get('title'),
@@ -91,7 +96,8 @@ class CollectionController extends Controller
             return response()->json([
                 "data" => $collection,
                 "status" => 200,
-                "success" => true
+                "success" => true,
+                "message" => "Data saved."
             ]);
         } catch (\Throwable $th) {
             return response()->json([
@@ -101,45 +107,4 @@ class CollectionController extends Controller
             ]);
         }
     }
-
-    public function update(Request $request)
-    {
-        try {
-            $validator = Validator::make($request->all(), [
-                'id' => 'required',
-                'name' => 'required|max:250',
-                'gender' => 'required'
-            ]);
-
-            if ($validator->fails()) {
-                return response()->json([
-                    "status" => 401,
-                    "success" => false,
-                    "message" => $validator->errors()->all()
-                ]);
-            }
-            
-            $collection = Category::where('id', $request->get('id'))->first();
-    
-            $collection = $collection->fill([
-                'name' => $request->get('name'),
-                'gender' => $request->get('gender'),
-                'slug' => Str::slug($request->get('name')),
-            ]);
-        
-            $collection->save();
-            return response()->json([
-                "data" => $collection,
-                "status" => 200,
-                "success" => true
-            ]);
-        } catch (\Throwable $th) {
-            return response()->json([
-                "status" => 200,
-                "success" => false,
-                "message" => $th->getMessage()
-            ]);
-        }
-    }
-
 }
