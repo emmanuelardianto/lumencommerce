@@ -107,4 +107,35 @@ class CollectionController extends Controller
             ]);
         }
     }
+
+    public function delete(Request $request)
+    {
+        try {
+            $validator = Validator::make($request->all(), [
+                'id' => 'required|exists:collections,id',
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    "status" => 401,
+                    "success" => false,
+                    "message" => $validator->errors()->all()
+                ]);
+            }
+            Collection::where('id', $request->get('id'))->delete();
+            CollectionItem::where('collection_id', $request->get('id'))->delete();
+
+            return response()->json([
+                "status" => 200,
+                "success" => true,
+                "message" => "Data has been deleted."
+            ]);
+        } catch (\Throwable $th) {
+            return response()->json([
+                "status" => 200,
+                "success" => false,
+                "message" => $th->getMessage()
+            ]);
+        }
+    }
 }
