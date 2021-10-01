@@ -16,4 +16,9 @@ class Collection extends Model
         'slug',
         'status'
     ];
+
+    public function item() {
+        return $this->hasMany(\App\Models\CollectionItem::class);
+    }
+
 }

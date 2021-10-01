@@ -37,11 +37,19 @@ class CollectionController extends Controller
         }
     }
 
-    public function getById($id)
+    public function getById($id, Request $request)
     {
         try {
+            $data = null;
+            if($request->get('with_product')) {
+                $data = Collection::with(['item' => function($query) {
+                    $query->with('product');
+                }])->where('id', $id)->first();
+            } else {
+                $data = Collection::where('id', $id)->first();
+            }
             return response()->json([
-                "data" => Collection::where('id', $id)->first(),
+                "data" => $data,
                 "status" => 200,
                 "success" => true
             ]);

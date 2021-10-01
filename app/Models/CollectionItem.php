@@ -13,4 +13,9 @@ class CollectionItem extends Model
         'collection_id',
         'product_id',
     ];
+
+
+    public function product() {
+        return $this->belongsTo(\App\Models\Product::class);
+    }
 }
