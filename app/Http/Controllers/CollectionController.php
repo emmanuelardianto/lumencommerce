@@ -42,7 +42,7 @@ class CollectionController extends Controller
         try {
             $data = null;
             if($request->get('with_product')) {
-                $data = Collection::with(['item' => function($query) {
+                $data = Collection::with(['items' => function($query) {
                     $query->with('product');
                 }])->where('id', $id)->first();
             } else {
@@ -99,7 +99,12 @@ class CollectionController extends Controller
                         'product_id' => $item
                     ];
                 });
-                CollectionItem::insert($items->toArray());
+                $collectionItems = CollectionItem::where('collection_id', $collection->id)->get();
+                $deleted = collect($collectionItems->pluck('product_id'))->diff($items->pluck('product_id'));
+                
+                $added = collect($items->pluck('product_id'))->diff(collect($collectionItems)->pluck('product_id'));
+                CollectionItem::whereIn('product_id', $deleted->toArray())->where('collection_id', $collection->id)->delete();
+                CollectionItem::insert($items->whereIn('product_id', $added)->toArray());
             }
             return response()->json([
                 "data" => $collection,

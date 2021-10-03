@@ -17,7 +17,7 @@ class Collection extends Model
         'status'
     ];
 
-    public function item() {
+    public function items() {
         return $this->hasMany(\App\Models\CollectionItem::class);
     }
 
