@@ -68,6 +68,7 @@ $router->group([ 'prefix' => 'product-variant-ref'], function () use($router) {
 $router->group([ 'prefix' => 'collection'], function () use($router) {
     $router->get('/', 'CollectionController@list');
     $router->get('/{id}', 'CollectionController@getById');
+    $router->get('/get-by-slug/{slug}', 'CollectionController@getBySlug');
     $router->post('/update', 'CollectionController@update');
     $router->post('/delete', 'CollectionController@delete');
 });

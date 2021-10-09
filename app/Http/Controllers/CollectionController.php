@@ -151,4 +151,28 @@ class CollectionController extends Controller
             ]);
         }
     }
+
+    public function getBySlug($slug, Request $request) {
+        try {
+            $data = null;
+            if($request->get('with_product')) {
+                $data = Collection::with(['items' => function($query) {
+                    $query->with('product');
+                }])->where('slug', $slug)->first();
+            } else {
+                $data = Collection::where('slug', $slug)->first();
+            }
+            return response()->json([
+                "data" => $data,
+                "status" => 200,
+                "success" => true
+            ]);
+        } catch (\Throwable $th) {
+            return response()->json([
+                "status" => 200,
+                "success" => false,
+                "message" => $th->getMessage()
+            ]);
+        }
+    }
 }

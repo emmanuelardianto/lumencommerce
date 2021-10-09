@@ -17,6 +17,10 @@ class Collection extends Model
         'status'
     ];
 
+    public function getRouteKeyName() {
+        return 'slug';
+    }
+
     public function items() {
         return $this->hasMany(\App\Models\CollectionItem::class);
     }
