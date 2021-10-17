@@ -15,12 +15,15 @@ class Product extends Model
         'slug',
         'description',
         'gender',
-        'variant_type'
+        'variant_type',
+        'images'
     ];
 
     public function getRouteKeyName() {
         return 'slug';
     }
+
+    protected $casts = ['images' => 'json'];
 
     public function getImageUrlAttribute($value) {
         if(empty($value))
