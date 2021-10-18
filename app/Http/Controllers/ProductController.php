@@ -7,6 +7,7 @@ use App\Models\Collection;
 use App\Models\CollectionItem;
 use App\Models\ProductVariant;
 use App\Models\ProductVariantRef;
+use App\Models\Gallery;
 use App\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -253,6 +254,59 @@ class ProductController extends Controller
                 "data" => $data,
                 "status" => 200,
                 "success" => true
+            ]);
+        } catch (\Throwable $th) {
+            return response()->json([
+                "status" => 200,
+                "success" => false,
+                "message" => $th->getMessage()
+            ]);
+        }
+    }
+
+    public function galleryUpdate(Request $request)
+    {
+        try {
+            $validator = Validator::make($request->all(), [
+                'id' => 'required',
+                'img' => 'required'
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    "status" => 401,
+                    "success" => false,
+                    "message" => $validator->errors()->all()
+                ]);
+            }
+            
+            $product = Product::where('id', $request->get('id'))->first();
+            if (is_null($product)) {
+                return response()->json([
+                    "status" => 401,
+                    "success" => false,
+                    "message" => "Data not found."
+                ]);
+            }
+
+            $file = $request->file('img');
+            $upload_path = 'images/product';
+            $file_name = $file->getClientOriginalName();
+            $generated_new_name = time() . '.' . $file->getClientOriginalExtension();
+            $file->move($upload_path, $generated_new_name);
+
+            $gallery = new Gallery();
+            $gallery->fill([
+                'path' => $upload_path.'/'.$generated_new_name
+            ]);
+
+            $gallery->save();
+
+            return response()->json([
+                "data" => $gallery,
+                "status" => 200,
+                "success" => true,
+                "message" => "Successfully deleted product."
             ]);
         } catch (\Throwable $th) {
             return response()->json([
