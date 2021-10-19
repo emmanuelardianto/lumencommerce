@@ -292,7 +292,7 @@ class ProductController extends Controller
             $file = $request->file('img');
             $upload_path = 'images/product';
             $file_name = $file->getClientOriginalName();
-            $generated_new_name = time() . '.' . $file->getClientOriginalExtension();
+            $generated_new_name = $product->slug.'-'.time() . '.' . $file->getClientOriginalExtension();
             $file->move($upload_path, $generated_new_name);
 
             $gallery = new Gallery();
