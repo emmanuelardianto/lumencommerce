@@ -301,7 +301,11 @@ class ProductController extends Controller
             ]);
 
             $gallery->save();
-
+            $images = collect($product->images);
+            $images->push($gallery->id);
+            
+            $product->images = $images->toArray();
+            $product->save();
             return response()->json([
                 "data" => $gallery,
                 "status" => 200,

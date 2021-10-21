@@ -15,4 +15,8 @@ class Gallery extends Model
     ];
 
     protected $casts = ['tags' => 'json'];
+
+    public function getPathAttribute($value) {
+        return url($value);
+    }
 }

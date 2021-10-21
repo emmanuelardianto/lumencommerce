@@ -19,6 +19,9 @@ class Product extends Model
         'images'
     ];
 
+    protected $attributes = ['galleries'];
+    protected $appends = ['galleries'];
+
     public function getRouteKeyName() {
         return 'slug';
     }
@@ -50,5 +53,9 @@ class Product extends Model
 
     public function product_variants() {
         return $this->hasMany(\App\Models\ProductVariant::class);
+    }
+
+    public function getGalleriesAttribute() {
+        return \App\Models\Gallery::whereIn('id', [1,2])->get();
     }
 }
