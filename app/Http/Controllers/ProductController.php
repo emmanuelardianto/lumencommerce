@@ -320,4 +320,49 @@ class ProductController extends Controller
             ]);
         }
     }
+
+    public function removeImage(Request $request)
+    {
+        try {
+            $validator = Validator::make($request->all(), [
+                'id' => 'required',
+                'galler_id' => 'required'
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    "status" => 401,
+                    "success" => false,
+                    "message" => $validator->errors()->all()
+                ]);
+            }
+            
+            $product = Product::where('id', $request->get('id'))->first();
+            if (is_null($product)) {
+                return response()->json([
+                    "status" => 401,
+                    "success" => false,
+                    "message" => "Data not found."
+                ]);
+            }
+            
+            $images = collect($product->images);
+            $images = $images->whereNot('id', $request->get('gallery_id'));
+            
+            $product->images = $images->toArray();
+            $product->save();
+            return response()->json([
+                "data" => $gallery,
+                "status" => 200,
+                "success" => true,
+                "message" => "Successfully remove image."
+            ]);
+        } catch (\Throwable $th) {
+            return response()->json([
+                "status" => 200,
+                "success" => false,
+                "message" => $th->getMessage()
+            ]);
+        }
+    }
 }

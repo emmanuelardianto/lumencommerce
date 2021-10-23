@@ -56,6 +56,6 @@ class Product extends Model
     }
 
     public function getGalleriesAttribute() {
-        return \App\Models\Gallery::whereIn('id', [1,2])->get();
+        return \App\Models\Gallery::whereIn('id', $this->images)->get();
     }
 }
