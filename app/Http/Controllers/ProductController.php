@@ -264,7 +264,7 @@ class ProductController extends Controller
         }
     }
 
-    public function galleryUpdate(Request $request)
+    public function imageUpdate(Request $request)
     {
         try {
             $validator = Validator::make($request->all(), [
@@ -320,13 +320,13 @@ class ProductController extends Controller
             ]);
         }
     }
-
-    public function removeImage(Request $request)
+    
+    public function imageRemove(Request $request)
     {
         try {
             $validator = Validator::make($request->all(), [
                 'id' => 'required',
-                'galler_id' => 'required'
+                'gallery_id' => 'required'
             ]);
 
             if ($validator->fails()) {
@@ -347,12 +347,14 @@ class ProductController extends Controller
             }
             
             $images = collect($product->images);
-            $images = $images->whereNot('id', $request->get('gallery_id'));
+            $delete_id = $request->get('gallery_id');
+            $images = $images->filter(function ($value) use($delete_id) {
+                return $value != $delete_id;
+            });
             
             $product->images = $images->toArray();
             $product->save();
             return response()->json([
-                "data" => $gallery,
                 "status" => 200,
                 "success" => true,
                 "message" => "Successfully remove image."

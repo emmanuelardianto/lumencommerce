@@ -29,7 +29,8 @@ $router->group([ 'prefix' => 'product'], function () use($router) {
     $router->post('/delete', 'ProductController@delete');
     $router->post('/update', 'ProductController@update');
     $router->get('/get/assets', 'ProductController@productAssets');
-    $router->post('/gallery-update', 'ProductController@galleryUpdate');
+    $router->post('/image-update', 'ProductController@imageUpdate');
+    $router->post('/image-remove', 'ProductController@imageRemove');
 });
 
 $router->group([ 'prefix' => 'category'], function () use($router) {
