@@ -17,7 +17,7 @@ class ProductController extends Controller
 {
     public function list(Request $request)
     {
-        try {
+        // try {
             $search = $request->get('search');
             $perPage = $request->get('per_page');
             $category = $request->get('category_id');
@@ -33,13 +33,13 @@ class ProductController extends Controller
                 "status" => 200,
                 "success" => true
             ]);
-        } catch (\Throwable $th) {
-            return response()->json([
-                "status" => 200,
-                "success" => false,
-                "message" => $th->getMessage()
-            ]);
-        }
+        // } catch (\Throwable $th) {
+        //     return response()->json([
+        //         "status" => 200,
+        //         "success" => false,
+        //         "message" => $th->getMessage()
+        //     ]);
+        // }
     }
 
     public function getById($id) {
