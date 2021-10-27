@@ -17,7 +17,14 @@ class ProductVariant extends Model
         'variant_value2',
         'qty',
         'status',
-        'image_url',
+        'gallery_id',
         'price'
     ];
+
+    protected $attributes = ['image'];
+    protected $appends = ['image'];
+
+    public function getImageAttribute() {
+        return \App\Models\Gallery::where('id', $this->gallery_id)->first();
+    }
 }
