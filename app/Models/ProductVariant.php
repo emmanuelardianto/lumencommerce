@@ -27,4 +27,8 @@ class ProductVariant extends Model
     public function getImageAttribute() {
         return \App\Models\Gallery::where('id', $this->gallery_id)->first();
     }
+
+    public function getProductAttribute() {
+        return $this->belongsTo('\App\Models\Gallery');
+    }
 }

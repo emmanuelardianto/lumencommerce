@@ -17,7 +17,7 @@ class ProductController extends Controller
 {
     public function list(Request $request)
     {
-        // try {
+        try {
             $search = $request->get('search');
             $perPage = $request->get('per_page');
             $category = $request->get('category_id');
@@ -33,13 +33,13 @@ class ProductController extends Controller
                 "status" => 200,
                 "success" => true
             ]);
-        // } catch (\Throwable $th) {
-        //     return response()->json([
-        //         "status" => 200,
-        //         "success" => false,
-        //         "message" => $th->getMessage()
-        //     ]);
-        // }
+        } catch (\Throwable $th) {
+            return response()->json([
+                "status" => 200,
+                "success" => false,
+                "message" => $th->getMessage()
+            ]);
+        }
     }
 
     public function getById($id) {
@@ -288,29 +288,19 @@ class ProductController extends Controller
                     "message" => "Data not found."
                 ]);
             }
-
+            
             $file = $request->file('img');
             $upload_path = 'images/product';
-            $file_name = $file->getClientOriginalName();
-            $generated_new_name = $product->slug.'-'.time() . '.' . $file->getClientOriginalExtension();
-            $file->move($upload_path, $generated_new_name);
-
-            $gallery = new Gallery();
-            $gallery->fill([
-                'path' => $upload_path.'/'.$generated_new_name
-            ]);
-
-            $gallery->save();
+            $gallery_id = Gallery::SaveUpload($file, $upload_path, $product->slug);
             $images = collect($product->images);
-            $images->push($gallery->id);
+            $images->push($gallery_id);
             
             $product->images = $images->toArray();
             $product->save();
             return response()->json([
-                "data" => $gallery,
                 "status" => 200,
                 "success" => true,
-                "message" => "Successfully deleted product."
+                "message" => "Gallery updated."
             ]);
         } catch (\Throwable $th) {
             return response()->json([
@@ -358,6 +348,50 @@ class ProductController extends Controller
                 "status" => 200,
                 "success" => true,
                 "message" => "Successfully remove image."
+            ]);
+        } catch (\Throwable $th) {
+            return response()->json([
+                "status" => 200,
+                "success" => false,
+                "message" => $th->getMessage()
+            ]);
+        }
+    }
+
+    public function variantImageUpdate(Request $request)
+    {
+        try {
+            $validator = Validator::make($request->all(), [
+                'id' => 'required',
+                'img' => 'required'
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    "status" => 401,
+                    "success" => false,
+                    "message" => $validator->errors()->all()
+                ]);
+            }
+            
+            $variant = ProductVariant::where('id', $request->get('id'))->first();
+            if (is_null($variant)) {
+                return response()->json([
+                    "status" => 401,
+                    "success" => false,
+                    "message" => "Data not found."
+                ]);
+            }
+            
+            $file = $request->file('img');
+            $upload_path = 'images/product';
+            
+            $variant->gallery_id = Gallery::SaveUpload($file, $upload_path, $variant->product->slug);
+            $variant->save();
+            return response()->json([
+                "status" => 200,
+                "success" => true,
+                "message" => "Gallery updated."
             ]);
         } catch (\Throwable $th) {
             return response()->json([
