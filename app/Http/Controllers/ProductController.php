@@ -362,8 +362,8 @@ class ProductController extends Controller
     {
         try {
             $validator = Validator::make($request->all(), [
-                'id' => 'required',
-                'img' => 'required'
+                'id' => 'required|exists:product_variants,id',
+                'gallery_id' => 'required|exists:galleries,id'
             ]);
 
             if ($validator->fails()) {
@@ -375,18 +375,8 @@ class ProductController extends Controller
             }
             
             $variant = ProductVariant::where('id', $request->get('id'))->first();
-            if (is_null($variant)) {
-                return response()->json([
-                    "status" => 401,
-                    "success" => false,
-                    "message" => "Data not found."
-                ]);
-            }
             
-            $file = $request->file('img');
-            $upload_path = 'images/product';
-            
-            $variant->gallery_id = Gallery::SaveUpload($file, $upload_path, $variant->product->slug);
+            $variant->gallery_id = $request->get('gallery_id');
             $variant->save();
             return response()->json([
                 "status" => 200,
